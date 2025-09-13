@@ -1,0 +1,10 @@
+C:\Users\Coral\source\repos\ConsoleCSEx6\bin\Debug\ConsoleCSEx6.exe.config
+C:\Users\Coral\source\repos\ConsoleCSEx6\bin\Debug\ConsoleCSEx6.exe
+C:\Users\Coral\source\repos\ConsoleCSEx6\bin\Debug\ConsoleCSEx6.pdb
+C:\Users\Coral\source\repos\ConsoleCSEx6\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Coral\source\repos\ConsoleCSEx6\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Coral\source\repos\ConsoleCSEx6\obj\Debug\ConsoleCSEx6.csproj.AssemblyReference.cache
+C:\Users\Coral\source\repos\ConsoleCSEx6\obj\Debug\ConsoleCSEx6.csproj.CoreCompileInputs.cache
+C:\Users\Coral\source\repos\ConsoleCSEx6\obj\Debug\ConsoleC.3D49BB60.Up2Date
+C:\Users\Coral\source\repos\ConsoleCSEx6\obj\Debug\ConsoleCSEx6.exe
+C:\Users\Coral\source\repos\ConsoleCSEx6\obj\Debug\ConsoleCSEx6.pdb
