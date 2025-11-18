@@ -1,1 +1,208 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Newtonsoft;
+using Newtonsoft.Json;
+
+namespace yelpforms
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        public class info
+        {
+            [JsonProperty("results")]
+            public List<Business> Results { get; set; }
+
+            [JsonProperty("resultCount")]
+            public int ResultCount { get; set; }
+        }
+
+        public class Business
+        {
+            [JsonProperty("bizId")]
+            public string BizId { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("alias")]
+            public string Alias { get; set; }
+
+            [JsonProperty("categories")]
+            public List<string> Categories { get; set; }
+
+            [JsonProperty("phone")]
+            public string Phone { get; set; }
+
+            [JsonProperty("website")]
+            public string Website { get; set; }
+
+            [JsonProperty("Images")]
+            public List<string> Images { get; set; }
+
+            [JsonProperty("rating")]
+            public double Rating { get; set; }
+
+            [JsonProperty("reviewCount")]
+            public int ReviewCount { get; set; }
+        }
+        private Panel CreateReviewCard(Form1.Business biz)
+        {
+            //makes cards for the businesses
+            Panel card = new Panel();
+            card.Width = 320;
+            card.Height = 180;
+            card.Margin = new Padding(10);
+            card.BackColor = Color.White;
+            card.BorderStyle = BorderStyle.FixedSingle;
+
+            
+            FlowLayoutPanel textPanel = new FlowLayoutPanel();
+            textPanel.FlowDirection = FlowDirection.TopDown;
+            textPanel.WrapContents = false;
+            textPanel.Dock = DockStyle.Left;
+            textPanel.Width = 200;
+            textPanel.AutoSize = true;
+            textPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            textPanel.Padding = new Padding(10);
+
+            
+            Label lblName = new Label();
+            lblName.Text = biz.Name;
+            lblName.Font = new Font("Arial", 11, FontStyle.Bold);
+            lblName.MaximumSize = new Size(180, 0);
+            lblName.AutoSize = true;
+
+            Label lblRating = new Label();
+            lblRating.Text = $"⭐ {biz.Rating} ({biz.ReviewCount} reviews)";
+            lblRating.Font = new Font("Arial", 10);
+            lblRating.MaximumSize = new Size(180, 0);
+            lblRating.AutoSize = true;
+
+            Label lblCategory = new Label();
+            lblCategory.Text = string.Join(", ", biz.Categories);
+            lblCategory.Font = new Font("Arial", 9, FontStyle.Italic);
+            lblCategory.MaximumSize = new Size(180, 0);
+            lblCategory.AutoSize = true;
+
+            Button btnWebsite = new Button();
+            btnWebsite.Text = "Visit Website";
+            btnWebsite.Location = new Point(10, 100);
+            btnWebsite.Click += (s, e) =>
+            {
+                if (!string.IsNullOrEmpty(biz.Website))
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = biz.Website,
+                        UseShellExecute = true
+                    });
+            };
+
+
+            PictureBox pic = new PictureBox();
+            pic.Dock = DockStyle.Right;
+            pic.Width = 100;
+            pic.SizeMode = PictureBoxSizeMode.Zoom;
+            if (biz.Images != null && biz.Images.Count > 0)
+            {
+                try { pic.LoadAsync(biz.Images[0]); } catch { }
+            }
+
+           
+            textPanel.Controls.Add(lblName);
+            textPanel.Controls.Add(lblRating);
+            textPanel.Controls.Add(lblCategory);
+            textPanel.Controls.Add(btnWebsite);
+            
+            card.Controls.Add(textPanel);
+            card.Controls.Add(pic);
+
+            return card;
+        }
+
+        private async Task Api(string city, string food)
+        {
+            string url = $"https://yelp-business-reviews.p.rapidapi.com/search?location={city}&query={food}&limit=10";
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-RapidAPI-Key", "3f063b706fmsh757cc59f38264b4p14be39jsned4f81524c86");
+                client.DefaultRequestHeaders.Add("X-RapidAPI-Host", "yelp-business-reviews.p.rapidapi.com");
+
+                try
+                {
+                    var response = await client.GetAsync(url);
+                    var body = await response.Content.ReadAsStringAsync();
+                    
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"API Error: {response.StatusCode}");
+                        return;
+                    }
+
+                    var apiResponse = JsonConvert.DeserializeObject<info>(body);
+
+                    flowReviews.Controls.Clear(); 
+
+                    foreach (var biz in apiResponse.Results)
+                    {
+                        var card = CreateReviewCard(biz);
+                        flowReviews.Controls.Add(card);
+                    }
+
+
+
+                    return;
+                }
+                
+                
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}");
+                    return;
+                }
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtCity.Text = string.Empty;
+            txtFood.Text = string.Empty;    
+            
+        }
+
+        
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private async void btnSubmit_Click(object sender, EventArgs e)
+        {
+            string food = "", city = "";
+            food = txtFood.Text;
+            city = txtCity.Text;
+            await Api(city, food);
+        }
+    }
+}
 
